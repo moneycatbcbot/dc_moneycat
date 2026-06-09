@@ -3,3 +3,4 @@ aiosqlite
 groq
 python-dotenv
 matplotlib
+flask
