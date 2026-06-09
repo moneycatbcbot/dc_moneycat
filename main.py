@@ -7,19 +7,29 @@ from dotenv import load_dotenv
 from flask import Flask
 from threading import Thread
 
+# 建立一個簡單的 Flask 伺服器
 app = Flask(__name__)
 
 @app.route('/')
 def home():
     return "Bot is alive!"
 
-def run():
-    app.run(host='0.0.0.0', port=8080)
+def run_server():
+    # Render 透過環境變數 PORT 分配連接埠，預設為 10000
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
 
-# 在 main() 函式啟動時加入這行
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
+# --------------------------------------------------
+# 在 main() 中修改
+# --------------------------------------------------
+async def main():
+    # 1. 啟動 HTTP 伺服器執行緒 (讓 Render 的 Web Service 抓到 Port)
+    server_thread = Thread(target=run_server)
+    server_thread.daemon = True
+    server_thread.start()
+    
+    # 2. 接著啟動您的 Bot
+    # ... 原有的 bot 啟動邏輯 ...
 
 # 載入環境變數
 load_dotenv()
