@@ -160,6 +160,7 @@ class Birthday(commands.Cog):
         app_commands.Choice(name="11 月 🍁", value=11), app_commands.Choice(name="12 月 🎄", value=12)
     ])
     async def query_birthday_by_month(self, interaction: discord.Interaction, 月份: app_commands.Choice[int]):
+        await interaction.response.defer(ephemeral=True, thinking=True)
         selected_month = 月份.value
         async with aiosqlite.connect(self.db_path) as db:
             async with db.execute("SELECT user_id, day FROM birthdays WHERE month = ? ORDER BY day ASC", (selected_month,)) as cursor:
@@ -176,7 +177,7 @@ class Birthday(commands.Cog):
             birthday_list_text += f"├ **{selected_month}/{day:02d}** ── {user_display}\n"
         
         embed.description = birthday_list_text
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     @app_commands.command(name="測試生日面板", description="[管理員專用] 立即手動觸發今日壽星檢測與發送")
     @app_commands.checks.has_permissions(administrator=True)

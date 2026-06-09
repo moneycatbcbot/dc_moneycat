@@ -57,15 +57,22 @@ class MyBot(commands.Bot):
 
     # 全域錯誤處理器
     async def on_tree_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        # 判斷是否已經回應過，避免產生 400 Bad Request
-        if interaction.response.is_done():
-            # 如果已經回應過，就改用 follow-up
-            await interaction.followup.send("❌ 系統發生錯誤。", ephemeral=True)
-        else:
-            # 如果還沒回應，才用 response.send_message
-            await interaction.response.send_message("❌ 系統發生錯誤。", ephemeral=True)
-        
+        # 紀錄錯誤詳細資訊到主控台
         print(f"❌ 發生錯誤: {error}")
+        
+        # 核心修正：判斷是否已經對該互動做過回應
+        if interaction.response.is_done():
+            # 如果已經回應過，改用 followup (這是後續追加回應的方法)
+            try:
+                await interaction.followup.send("❌ 系統發生錯誤。", ephemeral=True)
+            except Exception as e:
+                print(f"無法發送 followup: {e}")
+        else:
+            # 如果還沒回應，用 send_message
+            try:
+                await interaction.response.send_message("❌ 系統發生錯誤。", ephemeral=True)
+            except Exception as e:
+                print(f"無法發送 response: {e}")
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
