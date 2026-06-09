@@ -47,12 +47,15 @@ class MyBot(commands.Bot):
 
     # 全域錯誤處理器
     async def on_tree_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.MissingPermissions):
-            await interaction.response.send_message("❌ 權限不足，無法執行此指令。", ephemeral=True)
+        # 判斷是否已經回應過，避免產生 400 Bad Request
+        if interaction.response.is_done():
+            # 如果已經回應過，就改用 follow-up
+            await interaction.followup.send("❌ 系統發生錯誤。", ephemeral=True)
         else:
-            print(f"❌ 發生未處理的錯誤: {error}")
-            if not interaction.response.is_done():
-                await interaction.response.send_message("❌ 系統發生錯誤。", ephemeral=True)
+            # 如果還沒回應，才用 response.send_message
+            await interaction.response.send_message("❌ 系統發生錯誤。", ephemeral=True)
+        
+        print(f"❌ 發生錯誤: {error}")
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
