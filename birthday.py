@@ -21,7 +21,7 @@ class Birthday(commands.Cog):
         # 確保在 Bot 啟動時執行一次
         await self.check_birthday()
 
-    @tasks.loop(hours=24)
+    @tasks.loop(minutes=1)
     async def check_birthday(self):
         """每天定時檢查：清除舊壽星、加入新壽星、發送精美祝賀面板"""
         now = datetime.datetime.now()
