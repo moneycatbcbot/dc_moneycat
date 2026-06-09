@@ -1,0 +1,5 @@
+discord.py
+aiosqlite
+groq
+python-dotenv
+matplotlib
